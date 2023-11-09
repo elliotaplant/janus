@@ -5,25 +5,36 @@
     <style>
       body {
         margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background: transparent;
+        -webkit-app-region: drag; /* This makes the window draggable */
+
+        cursor: move; /* fallback if grab cursor is unsupported */
+        cursor: grab;
+        cursor: -moz-grab;
+        cursor: -webkit-grab;
       }
+
+      body:active {
+        cursor: grabbing;
+        cursor: -moz-grabbing;
+        cursor: -webkit-grabbing;
+      }
+
       #cameraFeed {
-        width: 160px;
-        height: 160px;
+        width: 100vw;
+        height: 100vh;
         border-radius: 50%;
         object-fit: cover;
         transform: scaleX(-1);
-        /* Add the CSS for mirrored video feed here */
+
+        cursor: move; /* fallback if grab cursor is unsupported */
+        cursor: grab;
+        cursor: -moz-grab;
+        cursor: -webkit-grab;
       }
     </style>
   </head>
   <body>
     <video id="cameraFeed" autoplay></video>
     <script src="cameraRenderer.js"></script>
-    <!-- Create this new file for your camera window -->
   </body>
 </html>
