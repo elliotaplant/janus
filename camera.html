@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Camera Feed</title>
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: transparent;
+      }
+      #cameraFeed {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        transform: scaleX(-1);
+        /* Add the CSS for mirrored video feed here */
+      }
+    </style>
+  </head>
+  <body>
+    <video id="cameraFeed" autoplay></video>
+    <script src="cameraRenderer.js"></script>
+    <!-- Create this new file for your camera window -->
+  </body>
+</html>
