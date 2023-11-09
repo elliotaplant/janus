@@ -1,0 +1,11 @@
+{
+  "name": "janus",
+  "version": "1.0.0",
+  "description": "A screen recording desktop app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "elliotaplant@gmail.com",
+  "license": "ISC"
+}
