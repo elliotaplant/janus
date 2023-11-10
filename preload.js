@@ -12,54 +12,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
       });
   },
 
-  getScreenStream: async () => {
-    const inputSources = await desktopCapturer.getSources({
-      types: ['window', 'screen'],
-    });
+  getDesktopAndAudioStream: () => ipcRenderer.invoke('GET_DESKTOP_AND_AUDIO_STREAM'),
+  saveVideoFile: (buffer, filePath) => ipcRenderer.invoke('SAVE_VIDEO_FILE', buffer, filePath),
 
-    try {
-      const screenStream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-            chromeMediaSourceId: inputSources[0].id,
-          },
-        },
-      });
-      return screenStream;
-    } catch (error) {
-      console.error('Error getting screen stream', error);
-      throw error;
-    }
-  },
-
-  getAudioStream: async () => {
-    try {
-      const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      return audioStream;
-    } catch (error) {
-      console.error('Error getting audio stream', error);
-      throw error;
-    }
-  },
-});
-
-contextBridge.exposeInMainWorld('desktopCapturer', {
-  getDesktopStream: async () => {
-    const sourceId = await ipcRenderer.invoke('REQUEST_DESKTOP_CAPTURE');
-    return navigator.mediaDevices.getUserMedia({
-      audio: {
-        mandatory: {
-          chromeMediaSource: 'desktop',
-        },
-      },
-      video: {
-        mandatory: {
-          chromeMediaSource: 'desktop',
-          chromeMediaSourceId: sourceId,
-        },
-      },
-    });
+  showSaveDialog: async () => {
+    return ipcRenderer.invoke('SHOW_SAVE_DIALOG');
   },
 });

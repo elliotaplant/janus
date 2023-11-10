@@ -1,4 +1,5 @@
-const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron');
+const { app, BrowserWindow, ipcMain, desktopCapturer, dialog } = require('electron');
+const fs = require('fs');
 const path = require('path');
 
 function createWindow() {
@@ -7,7 +8,8 @@ function createWindow() {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: false, // Set to false to use ipcRenderer in preload script
+      contextIsolation: true, // This needs to be true
+      enableRemoteModule: false, // Recommended to disable the remote module for security
     },
   });
 
@@ -47,13 +49,33 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-ipcMain.handle('REQUEST_DESKTOP_CAPTURE', async (event, sourceId) => {
-  const sources = await desktopCapturer.getSources({ types: ['screen'] });
+ipcMain.handle('GET_DESKTOP_AND_AUDIO_STREAM', async () => {
+  try {
+    const inputSources = await desktopCapturer.getSources({ types: ['screen'] });
+    const screenSourceId = inputSources[0].id; // Using the first screen source
 
-  // You could filter or let the user select a source here
-  for (const source of sources) {
-    if (source.name === 'Entire Screen') {
-      return source.id;
-    }
+    return screenSourceId;
+  } catch (error) {
+    console.error('Error in desktopCapturer:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('SHOW_SAVE_DIALOG', async () => {
+  const { filePath } = await dialog.showSaveDialog({
+    buttonLabel: 'Save video',
+    defaultPath: `capture-${Date.now()}.webm`,
+    filters: [{ name: 'Videos', extensions: ['webm'] }],
+  });
+
+  return filePath;
+});
+
+ipcMain.handle('SAVE_VIDEO_FILE', async (event, buffer, filePath) => {
+  try {
+    await fs.promises.writeFile(filePath, Buffer.from(buffer));
+    console.log('Video saved successfully!');
+  } catch (error) {
+    console.error('Failed to save video:', error);
   }
 });

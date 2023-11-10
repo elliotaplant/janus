@@ -1,55 +1,54 @@
-// In renderer.js or cameraRenderer.js
+const startCaptureButton = document.getElementById('startCapture');
+const stopCaptureButton = document.getElementById('stopCapture');
 let mediaRecorder;
 const recordedChunks = [];
 
-const startRecording = async () => {
-  console.log('starting recording');
-  const screenStream = await window.electronAPI.getScreenStream();
-  const audioStream = await window.electronAPI.getAudioStream();
-  const combinedStream = new MediaStream([
-    ...screenStream.getVideoTracks(),
-    ...audioStream.getAudioTracks(),
-  ]);
+startCaptureButton.addEventListener('click', async () => {
+  try {
+    const screenSourceId = await window.electronAPI.getDesktopAndAudioStream();
 
-  mediaRecorder = new MediaRecorder(combinedStream);
+    const screenStream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: screenSourceId,
+        },
+      },
+    });
 
-  mediaRecorder.ondataavailable = handleDataAvailable;
-  mediaRecorder.onstop = handleStop;
-  mediaRecorder.start();
-};
+    const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const combinedStream = new MediaStream([
+      ...screenStream.getVideoTracks(),
+      ...audioStream.getAudioTracks(),
+    ]);
 
-const stopRecording = () => {
-  mediaRecorder.stop();
-};
-
-const handleDataAvailable = (event) => {
-  console.log('data-available');
-  if (event.data.size > 0) {
-    recordedChunks.push(event.data);
-    console.log(`Received ${event.data.size} bytes of data.`);
+    mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm; codecs=vp8' });
+    mediaRecorder.ondataavailable = handleDataAvailable;
+    mediaRecorder.onstop = handleStop;
+    mediaRecorder.start();
+  } catch (err) {
+    console.error('Error capturing screen and audio:', err);
   }
-};
+});
 
-const handleStop = async () => {
+stopCaptureButton.addEventListener('click', () => {
+  mediaRecorder.stop();
+});
+
+function handleDataAvailable(e) {
+  recordedChunks.push(e.data);
+}
+
+async function handleStop(e) {
   const blob = new Blob(recordedChunks, {
     type: 'video/webm; codecs=vp8',
   });
 
-  const buffer = Buffer.from(await blob.arrayBuffer());
-
-  const { dialog } = require('electron').remote;
-  const { writeFile } = require('fs');
-
-  const { filePath } = await dialog.showSaveDialog({
-    buttonLabel: 'Save video',
-    defaultPath: `vid-${Date.now()}.webm`,
-  });
+  const buffer = await blob.arrayBuffer();
+  const filePath = await window.electronAPI.showSaveDialog();
 
   if (filePath) {
-    writeFile(filePath, buffer, () => console.log('video saved successfully!'));
+    await window.electronAPI.saveVideoFile(buffer, filePath);
   }
-};
-
-// Further in renderer.js or cameraRenderer.js
-document.getElementById('startRecording').addEventListener('click', startRecording);
-document.getElementById('stopRecording').addEventListener('click', stopRecording);
+}
