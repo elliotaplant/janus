@@ -13,7 +13,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   getDesktopAndAudioStream: () => ipcRenderer.invoke('GET_DESKTOP_AND_AUDIO_STREAM'),
-  saveVideoFile: (buffer, filePath) => ipcRenderer.invoke('SAVE_VIDEO_FILE', buffer, filePath),
+  saveVideoFile: (buffer, filePath, format) =>
+    ipcRenderer.invoke('SAVE_VIDEO_FILE', buffer, filePath, format),
   askForFormat: () => ipcRenderer.invoke('ASK_FOR_FORMAT'),
 
   showSaveDialog: async () => {

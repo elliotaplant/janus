@@ -51,6 +51,6 @@ async function handleStop(e) {
   const filePath = await window.electronAPI.showSaveDialog();
 
   if (filePath) {
-    await window.electronAPI.saveVideoFile(buffer, filePath);
+    await window.electronAPI.saveVideoFile(buffer, filePath, format);
   }
 }
