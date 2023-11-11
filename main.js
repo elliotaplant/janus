@@ -27,20 +27,6 @@ function getFFmpegPath() {
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true, // This needs to be true
-      enableRemoteModule: false, // Recommended to disable the remote module for security
-    },
-  });
-
-  win.loadFile('index.html');
-}
-
-function createCameraWindow() {
-  const cameraWindow = new BrowserWindow({
     width: 200,
     height: 200,
     frame: false,
@@ -48,20 +34,16 @@ function createCameraWindow() {
     transparent: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true, // This needs to be true
+      enableRemoteModule: false, // Recommended to disable the remote module for security
     },
   });
 
-  cameraWindow.loadFile('camera.html');
-
-  // Remove the window from memory when closed
-  cameraWindow.on('closed', () => {
-    cameraWindow = null;
-  });
+  win.loadFile('camera.html');
 }
 
 app.whenReady().then(() => {
   createWindow();
-  createCameraWindow();
 });
 
 app.on('window-all-closed', () => {
