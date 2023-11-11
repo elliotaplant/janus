@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, desktopCapturer, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -71,11 +72,52 @@ ipcMain.handle('SHOW_SAVE_DIALOG', async () => {
   return filePath;
 });
 
-ipcMain.handle('SAVE_VIDEO_FILE', async (event, buffer, filePath) => {
+ipcMain.handle('SAVE_VIDEO_FILE', async (event, buffer, filePath, format) => {
   try {
-    await fs.promises.writeFile(filePath, Buffer.from(buffer));
+    const webmPath = filePath + '.webm';
+    await fs.promises.writeFile(webmPath, Buffer.from(buffer));
+
+    if (format === 'mp4') {
+      const mp4Path = filePath + '.mp4';
+      await convertWebMToMP4(webmPath, mp4Path);
+    }
+
     console.log('Video saved successfully!');
   } catch (error) {
-    console.error('Failed to save video:', error);
+    console.error('Failed to save or convert video:', error);
   }
 });
+
+ipcMain.handle('ASK_FOR_FORMAT', async () => {
+  const options = {
+    type: 'question',
+    buttons: ['WebM', 'MP4'],
+    title: 'Select Format',
+    message: 'Which file format would you like to save the video in?',
+  };
+
+  const { response } = await dialog.showMessageBox(options);
+  return response === 1 ? 'mp4' : 'webm';
+});
+
+function convertWebMToMP4(inputPath, outputPath) {
+  return new Promise((resolve, reject) => {
+    const ffmpeg = spawn('ffmpeg', [
+      '-i',
+      inputPath,
+      '-vcodec',
+      'libx264',
+      '-acodec',
+      'aac',
+      outputPath,
+    ]);
+
+    ffmpeg.on('close', (code) => {
+      if (code === 0) {
+        resolve(outputPath);
+      } else {
+        reject(new Error(`FFmpeg exited with code ${code}`));
+      }
+    });
+  });
+}

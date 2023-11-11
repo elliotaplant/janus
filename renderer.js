@@ -46,6 +46,8 @@ async function handleStop(e) {
   });
 
   const buffer = await blob.arrayBuffer();
+  const format = await window.electronAPI.askForFormat(); // Ask for format
+
   const filePath = await window.electronAPI.showSaveDialog();
 
   if (filePath) {

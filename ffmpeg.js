@@ -15,4 +15,4 @@ function getFFmpegPath() {
   }
 }
 
-export const ffmpegPath = getFFmpegPath();
+const ffmpegPath = getFFmpegPath();
