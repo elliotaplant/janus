@@ -17,7 +17,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('SAVE_VIDEO_FILE', buffer, filePath, format),
   askForFormat: () => ipcRenderer.invoke('ASK_FOR_FORMAT'),
 
-  showSaveDialog: async () => {
-    return ipcRenderer.invoke('SHOW_SAVE_DIALOG');
-  },
+  showSaveDialog: (extension) => ipcRenderer.invoke('SHOW_SAVE_DIALOG', extension),
 });

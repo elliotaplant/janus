@@ -62,11 +62,11 @@ ipcMain.handle('GET_DESKTOP_AND_AUDIO_STREAM', async () => {
   }
 });
 
-ipcMain.handle('SHOW_SAVE_DIALOG', async () => {
+ipcMain.handle('SHOW_SAVE_DIALOG', async (event, extension) => {
   const { filePath } = await dialog.showSaveDialog({
     buttonLabel: 'Save video',
-    defaultPath: `capture-${Date.now()}.webm`,
-    filters: [{ name: 'Videos', extensions: ['webm'] }],
+    defaultPath: `capture-${Date.now()}${extension}`,
+    filters: [{ name: 'Videos', extensions: [extension] }],
   });
 
   return filePath;
@@ -74,12 +74,19 @@ ipcMain.handle('SHOW_SAVE_DIALOG', async () => {
 
 ipcMain.handle('SAVE_VIDEO_FILE', async (event, buffer, filePath, format) => {
   try {
-    const webmPath = filePath + '.webm';
-    await fs.promises.writeFile(webmPath, Buffer.from(buffer));
-
     if (format === 'mp4') {
-      const mp4Path = filePath + '.mp4';
-      await convertWebMToMP4(webmPath, mp4Path);
+      // First save as WebM
+      const webmPath = filePath.replace('.mp4', '.webm');
+      await fs.promises.writeFile(webmPath, Buffer.from(buffer));
+
+      // Convert to MP4
+      await convertWebMToMP4(webmPath, filePath);
+
+      // Optionally, delete the original WebM file
+      await fs.promises.unlink(webmPath);
+    } else {
+      // Save as WebM
+      await fs.promises.writeFile(filePath, Buffer.from(buffer));
     }
 
     console.log('Video saved successfully!');

@@ -48,7 +48,8 @@ async function handleStop(e) {
   const buffer = await blob.arrayBuffer();
   const format = await window.electronAPI.askForFormat(); // Ask for format
 
-  const filePath = await window.electronAPI.showSaveDialog();
+  const extension = format === 'mp4' ? '.mp4' : '.webm';
+  const filePath = await window.electronAPI.showSaveDialog(extension); // Pass the chosen extension
 
   if (filePath) {
     await window.electronAPI.saveVideoFile(buffer, filePath, format);
