@@ -12,7 +12,7 @@ You'll need to create an `ffmpeg-binaries` directory with this structure:
 ffmpeg-binaries
 ├── linux
 │   └── ffmpeg
-├── mac
+├── darwin
 │   └── ffmpeg
 └── win
     └── ffmpeg.exe

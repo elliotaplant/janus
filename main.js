@@ -2,6 +2,28 @@ const { app, BrowserWindow, ipcMain, desktopCapturer, dialog } = require('electr
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const os = require('os');
+
+function getFFmpegPath() {
+  const platform = os.platform();
+  let ffmpegBinary;
+
+  switch (platform) {
+    case 'win32':
+      ffmpegBinary = 'ffmpeg.exe';
+      break;
+    case 'darwin':
+      ffmpegBinary = 'ffmpeg';
+      break;
+    case 'linux':
+      ffmpegBinary = 'ffmpeg';
+      break;
+    default:
+      throw new Error(`Unsupported platform: ${platform}`);
+  }
+
+  return path.join(__dirname, 'ffmpeg-binaries', platform, ffmpegBinary);
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -19,8 +41,8 @@ function createWindow() {
 
 function createCameraWindow() {
   const cameraWindow = new BrowserWindow({
-    width: 160,
-    height: 160,
+    width: 200,
+    height: 200,
     frame: false,
     alwaysOnTop: true,
     transparent: true,
@@ -65,7 +87,7 @@ ipcMain.handle('GET_DESKTOP_AND_AUDIO_STREAM', async () => {
 ipcMain.handle('SHOW_SAVE_DIALOG', async (event, extension) => {
   const { filePath } = await dialog.showSaveDialog({
     buttonLabel: 'Save video',
-    defaultPath: `capture-${Date.now()}${extension}`,
+    defaultPath: `janus-recording-${Date.now()}${extension}`,
     filters: [{ name: 'Videos', extensions: [extension] }],
   });
 
@@ -100,7 +122,8 @@ ipcMain.handle('ASK_FOR_FORMAT', async () => {
     type: 'question',
     buttons: ['WebM', 'MP4'],
     title: 'Select Format',
-    message: 'Which file format would you like to save the video in?',
+    message:
+      'Select your video format: MP4 is better for sharing, especially with iOS and Mac users. WebM is Ideal for web and has a smaller file size.',
   };
 
   const { response } = await dialog.showMessageBox(options);
@@ -109,7 +132,9 @@ ipcMain.handle('ASK_FOR_FORMAT', async () => {
 
 function convertWebMToMP4(inputPath, outputPath) {
   return new Promise((resolve, reject) => {
-    const ffmpeg = spawn('ffmpeg', [
+    const ffmpegPath = getFFmpegPath();
+    console.log('ffmpegPath', ffmpegPath);
+    const ffmpeg = spawn(getFFmpegPath(), [
       '-i',
       inputPath,
       '-vcodec',
