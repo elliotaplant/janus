@@ -1,12 +1,74 @@
 <!doctype html>
 <html>
   <head>
-    <title>Screen Capture</title>
+    <title>Screen Capture with Camera Feed</title>
+    <style>
+      body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+        -webkit-app-region: drag;
+        /* position: relative; */
+      }
+
+      #cameraFeed {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 50%;
+        position: absolute;
+        z-index: 1;
+        object-fit: cover;
+        transform: scaleX(-1);
+      }
+
+      #controls {
+        -webkit-app-region: no-drag;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        z-index: 10;
+        transition: opacity 200ms;
+      }
+
+      #controls.recording {
+        opacity: 0;
+      }
+
+      .button {
+        cursor: pointer;
+        border: none;
+      }
+
+      #control-btn {
+        background-color: red;
+        width: 30px;
+        height: 30px;
+        border: 10px solid grey;
+        border-radius: 50%;
+      }
+
+      .recording #control-btn {
+        background-color: red;
+        width: 30px;
+        height: 30px;
+        border-radius: 3px;
+      }
+
+      body:hover #controls,
+      #controls:hover {
+        display: block;
+        opacity: 1;
+      }
+    </style>
   </head>
   <body>
-    <h1>Screen Capture</h1>
-    <button id="startCapture">Start Capture</button>
-    <button id="stopCapture">Stop Capture</button>
+    <div id="controls">
+      <button id="control-btn" class="button" />
+    </div>
+    <video id="cameraFeed" autoplay></video>
     <script src="renderer.js"></script>
   </body>
 </html>

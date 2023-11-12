@@ -39,7 +39,7 @@ function createWindow() {
     },
   });
 
-  win.loadFile('camera.html');
+  win.loadFile('index.html');
 }
 
 app.whenReady().then(() => {
