@@ -18,6 +18,7 @@ controlButton.addEventListener('click', async () => {
 async function startRecording() {
   try {
     controls.classList.add('recording');
+    controlButton.textContent = 'Stop Recording';
     const screenSourceId = await window.electronAPI.getDesktopAndAudioStream();
 
     const screenStream = await navigator.mediaDevices.getUserMedia({
@@ -44,6 +45,7 @@ async function startRecording() {
     console.error('Error capturing screen and audio:', err);
     mediaRecorder = null;
     controls.classList.remove('recording');
+    controlButton.textContent = 'Start Recording';
     // alert the user of an error
   }
 }
@@ -73,6 +75,7 @@ async function handleStop() {
   }
   mediaRecorder = null;
   controls.classList.remove('recording');
+  controlButton.textContent = 'Start Recording';
 }
 
 document.addEventListener('DOMContentLoaded', () => {

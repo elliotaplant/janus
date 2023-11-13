@@ -28,7 +28,7 @@ function getFFmpegPath() {
 function createWindow() {
   const win = new BrowserWindow({
     width: 200,
-    height: 200,
+    height: 240,
     frame: false,
     alwaysOnTop: true,
     transparent: true,
@@ -69,7 +69,7 @@ ipcMain.handle('GET_DESKTOP_AND_AUDIO_STREAM', async () => {
 ipcMain.handle('SHOW_SAVE_DIALOG', async (event, extension) => {
   const { filePath } = await dialog.showSaveDialog({
     buttonLabel: 'Save video',
-    defaultPath: `janus-recording-${Date.now()}${extension}`,
+    defaultPath: `janus-recording-${new Date().toISOString().slice(0, 10)}${extension}`,
     filters: [{ name: 'Videos', extensions: [extension] }],
   });
 
@@ -93,7 +93,7 @@ ipcMain.handle('SAVE_VIDEO_FILE', async (event, buffer, filePath, format) => {
       await fs.promises.writeFile(filePath, Buffer.from(buffer));
     }
 
-    console.log('Video saved successfully!');
+    console.log('Video saved successfully');
   } catch (error) {
     console.error('Failed to save or convert video:', error);
   }
@@ -114,8 +114,6 @@ ipcMain.handle('ASK_FOR_FORMAT', async () => {
 
 function convertWebMToMP4(inputPath, outputPath) {
   return new Promise((resolve, reject) => {
-    const ffmpegPath = getFFmpegPath();
-    console.log('ffmpegPath', ffmpegPath);
     const ffmpeg = spawn(getFFmpegPath(), [
       '-i',
       inputPath,
