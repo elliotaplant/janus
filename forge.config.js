@@ -2,6 +2,7 @@ module.exports = {
   packagerConfig: {
     asar: true,
     icon: './icons/janus_icon', // no file extension required
+    extraResource: ['./ffmpeg-binaries/darwin'],
     // osxSign: {},
     // osxNotarize: {
     //   tool: 'notarytool',

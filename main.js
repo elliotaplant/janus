@@ -79,7 +79,9 @@ ipcMain.handle('ASK_FOR_FORMAT', async () => {
 // Helper Functions
 function convertWebMToMP4(inputPath, outputPath) {
   return new Promise((resolve, reject) => {
-    const ffmpeg = spawn(getFFmpegPath(), [
+    const ffmpegPath = getFFmpegPath();
+    console.log('ffmpegPath', ffmpegPath);
+    const ffmpeg = spawn(ffmpegPath, [
       '-i',
       inputPath,
       '-vcodec',
@@ -115,6 +117,10 @@ function getFFmpegPath() {
       break;
     default:
       throw new Error(`Unsupported platform: ${platform}`);
+  }
+
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, platform, ffmpegBinary);
   }
 
   return path.join(__dirname, 'ffmpeg-binaries', platform, ffmpegBinary);
