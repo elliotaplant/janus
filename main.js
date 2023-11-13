@@ -124,6 +124,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 200,
     height: 240,
+    icon: 'icons/janus_icon.icns',
     frame: false,
     alwaysOnTop: true,
     transparent: true,

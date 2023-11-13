@@ -1,4 +1,5 @@
 node_modules
 ffmpeg-binaries
+.DS_Store
 
 out/
