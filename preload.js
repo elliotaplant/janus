@@ -1,4 +1,4 @@
-const { contextBridge, desktopCapturer, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   handleStream: (videoElement) => {
@@ -16,6 +16,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveVideoFile: (buffer, filePath, format) =>
     ipcRenderer.invoke('SAVE_VIDEO_FILE', buffer, filePath, format),
   askForFormat: () => ipcRenderer.invoke('ASK_FOR_FORMAT'),
-
   showSaveDialog: (extension) => ipcRenderer.invoke('SHOW_SAVE_DIALOG', extension),
 });

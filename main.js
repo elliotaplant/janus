@@ -4,44 +4,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const os = require('os');
 
-function getFFmpegPath() {
-  const platform = os.platform();
-  let ffmpegBinary;
-
-  switch (platform) {
-    case 'win32':
-      ffmpegBinary = 'ffmpeg.exe';
-      break;
-    case 'darwin':
-      ffmpegBinary = 'ffmpeg';
-      break;
-    case 'linux':
-      ffmpegBinary = 'ffmpeg';
-      break;
-    default:
-      throw new Error(`Unsupported platform: ${platform}`);
-  }
-
-  return path.join(__dirname, 'ffmpeg-binaries', platform, ffmpegBinary);
-}
-
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 200,
-    height: 240,
-    frame: false,
-    alwaysOnTop: true,
-    transparent: true,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true, // This needs to be true
-      enableRemoteModule: false, // Recommended to disable the remote module for security
-    },
-  });
-
-  win.loadFile('index.html');
-}
-
+// App Lifecycle
 app.whenReady().then(() => {
   createWindow();
 });
@@ -54,6 +17,7 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
+// Inter Process Communication handlers
 ipcMain.handle('GET_DESKTOP_AND_AUDIO_STREAM', async () => {
   try {
     const inputSources = await desktopCapturer.getSources({ types: ['screen'] });
@@ -112,6 +76,7 @@ ipcMain.handle('ASK_FOR_FORMAT', async () => {
   return response === 1 ? 'mp4' : 'webm';
 });
 
+// Helper Functions
 function convertWebMToMP4(inputPath, outputPath) {
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn(getFFmpegPath(), [
@@ -132,4 +97,42 @@ function convertWebMToMP4(inputPath, outputPath) {
       }
     });
   });
+}
+
+function getFFmpegPath() {
+  const platform = os.platform();
+  let ffmpegBinary;
+
+  switch (platform) {
+    case 'win32':
+      ffmpegBinary = 'ffmpeg.exe';
+      break;
+    case 'darwin':
+      ffmpegBinary = 'ffmpeg';
+      break;
+    case 'linux':
+      ffmpegBinary = 'ffmpeg';
+      break;
+    default:
+      throw new Error(`Unsupported platform: ${platform}`);
+  }
+
+  return path.join(__dirname, 'ffmpeg-binaries', platform, ffmpegBinary);
+}
+
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 200,
+    height: 240,
+    frame: false,
+    alwaysOnTop: true,
+    transparent: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true, // This needs to be true
+      enableRemoteModule: false, // Recommended to disable the remote module for security
+    },
+  });
+
+  win.loadFile('index.html');
 }
