@@ -5,7 +5,11 @@ module.exports = {
     icon: './icons/janus_icon', // no file extension required
     extraResource: ['./ffmpeg-binaries/darwin'], // TODO: import win and linux versions
     appBundleId: 'com.elliotplant.janus',
-    osxSign: {},
+    osxSign: {
+      identity: process.env.CERTIFICATE_NAME,
+    },
+
+    hardenedRuntime: true,
     osxNotarize: {
       tool: 'notarytool',
       appleId: process.env.APPLE_ID,
@@ -22,12 +26,6 @@ module.exports = {
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
-    },
-    {
-      name: '@electron-forge/maker-pkg',
-      config: {
-        // keychain: 'my-secret-ci-keychain',
-      },
     },
     {
       name: '@electron-forge/maker-deb',
