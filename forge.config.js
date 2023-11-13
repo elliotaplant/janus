@@ -1,15 +1,16 @@
 module.exports = {
   packagerConfig: {
+    name: 'Janus',
     asar: true,
     icon: './icons/janus_icon', // no file extension required
-    extraResource: ['./ffmpeg-binaries/darwin'],
-    // osxSign: {},
-    // osxNotarize: {
-    //   tool: 'notarytool',
-    //   appleId: process.env.APPLE_ID,
-    //   appleIdPassword: process.env.APPLE_PASSWORD,
-    //   teamId: process.env.APPLE_TEAM_ID,
-    // },
+    extraResource: ['./ffmpeg-binaries/darwin'], // TODO: import win and linux versions
+    osxSign: {},
+    osxNotarize: {
+      tool: 'notarytool',
+      appleId: process.env.APPLE_ID,
+      appleIdPassword: process.env.APPLE_PASSWORD,
+      teamId: process.env.APPLE_TEAM_ID,
+    },
   },
   rebuildConfig: {},
   makers: [
