@@ -1,7 +1,7 @@
 const controls = document.getElementById('controls');
 const controlButton = document.getElementById('control-btn');
 let mediaRecorder;
-const recordedChunks = [];
+let recordedChunks = [];
 
 controlButton.addEventListener('click', async () => {
   try {
@@ -74,6 +74,7 @@ async function handleStop() {
     // alert the user of an error
   }
   mediaRecorder = null;
+  recordedChunks = [];
   controls.classList.remove('recording');
   controlButton.textContent = 'Start Recording';
 }

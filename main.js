@@ -33,7 +33,7 @@ ipcMain.handle('GET_DESKTOP_AND_AUDIO_STREAM', async () => {
 ipcMain.handle('SHOW_SAVE_DIALOG', async (event, extension) => {
   const { filePath } = await dialog.showSaveDialog({
     buttonLabel: 'Save video',
-    defaultPath: `janus-recording-${new Date().toISOString().slice(0, 10)}${extension}`,
+    defaultPath: `janus-recording-${Date.now()}${extension}`,
     filters: [{ name: 'Videos', extensions: [extension] }],
   });
 
